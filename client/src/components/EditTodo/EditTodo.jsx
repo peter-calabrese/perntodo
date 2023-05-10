@@ -9,6 +9,7 @@ const EditTodo = ({ todo }) => {
       return;
     }
     const body = { description };
+    console.log(todo);
     const editTodo = await fetch(`http://localhost:3001/todos/${todo_id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -35,10 +36,7 @@ const EditTodo = ({ todo }) => {
               />
             </div>
             <div className="modal-footer">
-              <button
-                className="edit-button"
-                onClick={() => editTodo(todo.todo_id)}
-              >
+              <button className="edit-button" onClick={() => editTodo(todo.id)}>
                 Edit
               </button>
               <button
