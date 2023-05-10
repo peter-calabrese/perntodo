@@ -16,7 +16,11 @@ const EditTodo = ({ todo }) => {
   };
   return (
     <div>
-      <button onClick={() => setShowEdit(true)} data-target>
+      <button
+        className="edit-button"
+        onClick={() => setShowEdit(true)}
+        data-target
+      >
         Edit
       </button>
       {showEdit && (

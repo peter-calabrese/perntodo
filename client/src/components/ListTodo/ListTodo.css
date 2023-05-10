@@ -21,15 +21,12 @@ table {
   border-top: solid 1px;
 }
 .btn-danger {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background-color: #eb4d4b;
   color: #fff;
   width: 20mm;
-  height: 11mm;
-  border-radius: 8px;
-  font-weight: 500;
-  font-size: 1.05em;
+  height: 10mm;
   border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1.1em;
 }
