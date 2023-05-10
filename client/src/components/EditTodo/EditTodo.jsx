@@ -1,26 +1,24 @@
 import React, { useState } from "react";
 import "./EditTodo.css";
 const EditTodo = ({ todo }) => {
-  const [description, setDescription] = useState(todo);
+  const [description, setDescription] = useState(todo.description);
   const [showEdit, setShowEdit] = useState(false);
   const editTodo = async (todo_id) => {
-    console.log(todo_id);
+    if (description === todo.description) {
+      setShowEdit(false);
+      return;
+    }
     const body = { description };
     const editTodo = await fetch(`http://localhost:3001/todos/${todo_id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    // setShowEdit(false);
     window.location = "/";
   };
   return (
     <div>
-      <button
-        className="edit-button"
-        onClick={() => setShowEdit(true)}
-        data-target
-      >
+      <button className="edit-button" onClick={() => setShowEdit(true)}>
         Edit
       </button>
       {showEdit && (
