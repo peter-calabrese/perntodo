@@ -1,8 +1,8 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const pool = require("./db");
-
+const models = require("./src/models/");
+const { Todo } = models.default;
 // middleware
 app.use(cors());
 app.use(express.json()); // gives access to req.body
@@ -14,12 +14,9 @@ app.use(express.json()); // gives access to req.body
 app.post("/todos", async (req, res) => {
   try {
     const { description } = req.body;
-
-    const newTodo = await pool.query(
-      "INSERT INTO todo (description) VALUES($1) RETURNING *",
-      [description]
-    );
-    res.json(newTodo.rows);
+    const newTodo = await Todo.create({ description });
+    console.log(newTodo);
+    res.json(newTodo.toJSON());
   } catch (err) {
     console.log(err.message);
   }
@@ -29,8 +26,9 @@ app.post("/todos", async (req, res) => {
 
 app.get("/todos", async (req, res) => {
   try {
-    const allTodos = await pool.query("SELECT * FROM todo");
-    res.json(allTodos.rows);
+    const allTodos = await Todo.findAll();
+    const json = allTodos.map((todo) => todo.toJSON());
+    res.json(json);
   } catch (err) {
     console.log(err.message);
   }
@@ -41,10 +39,8 @@ app.get("/todos", async (req, res) => {
 app.get("/todos/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const allTodos = await pool.query("SELECT * FROM todo WHERE todo_id = $1", [
-      id,
-    ]);
-    res.json(allTodos.rows);
+    const todo = await Todo.findByPk(id);
+    res.json([todo.toJSON()]);
   } catch (err) {
     console.log(err.message);
   }
@@ -56,11 +52,11 @@ app.put("/todos/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { description } = req.body;
-
-    const updateTodo = await pool.query(
-      "UPDATE todo SET description = $1 WHERE todo_id = $2",
-      [description, id]
-    );
+    const todo = await Todo.findByPk(id);
+    if (todo != null) {
+      todo.description = description;
+      await todo.save();
+    }
     res.json("Update Successful!");
   } catch (err) {
     console.log(err.message);
@@ -72,7 +68,10 @@ app.put("/todos/:id", async (req, res) => {
 app.delete("/todos/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const deleteTodo = pool.query("DELETE FROM todo WHERE todo_id = $1", [id]);
+    const todo = await Todo.findByPk(id);
+    if (todo != null) {
+      await todo.destroy();
+    }
     res.json("Todo was deleted!");
   } catch (err) {
     console.log(err.message);
