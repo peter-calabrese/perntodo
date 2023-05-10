@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import "./ListTodo.css";
+import EditTodo from "../EditTodo/EditTodo";
 
 const ListTodo = () => {
   const [todos, setTodos] = useState([]);
-
   const getTodos = async () => {
     try {
       const response = await fetch("http://localhost:3001/todos");
@@ -41,7 +41,9 @@ const ListTodo = () => {
           {todos.map((todo) => (
             <tr key={todo.todo_id}>
               <td>{todo.description}</td>
-              <td>edit</td>
+              <td>
+                <EditTodo todo={todo} />
+              </td>
               <td>
                 <button
                   className="btn-danger"

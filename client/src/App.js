@@ -1,6 +1,6 @@
 import "./App.css";
-import InputTodo from "./components/InputTodo";
-import ListTodo from "./components/ListTodo";
+import InputTodo from "./components/InputTodo/InputTodo";
+import ListTodo from "./components/ListTodo/ListTodo";
 function App() {
   return (
     <div>
