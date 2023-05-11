@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const pool = require("./db");
+const Todo = require("./db");
 
 // middleware
 app.use(cors());
@@ -15,11 +15,10 @@ app.post("/todos", async (req, res) => {
   try {
     const { description } = req.body;
 
-    const newTodo = await pool.query(
-      "INSERT INTO todo (description) VALUES($1) RETURNING *",
-      [description]
-    );
-    res.json(newTodo.rows);
+    const newTodo = await Todo.create({
+      description: description,
+    });
+    res.json(newTodo);
   } catch (err) {
     console.log(err.message);
   }
@@ -29,8 +28,8 @@ app.post("/todos", async (req, res) => {
 
 app.get("/todos", async (req, res) => {
   try {
-    const allTodos = await pool.query("SELECT * FROM todo");
-    res.json(allTodos.rows);
+    const resp = await Todo.findAll();
+    await res.json(resp);
   } catch (err) {
     console.log(err.message);
   }
@@ -41,10 +40,8 @@ app.get("/todos", async (req, res) => {
 app.get("/todos/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const allTodos = await pool.query("SELECT * FROM todo WHERE todo_id = $1", [
-      id,
-    ]);
-    res.json(allTodos.rows);
+    const todo = await Todo.findByPk(id);
+    res.json(todo);
   } catch (err) {
     console.log(err.message);
   }
@@ -56,14 +53,22 @@ app.put("/todos/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { description } = req.body;
-
-    const updateTodo = await pool.query(
-      "UPDATE todo SET description = $1 WHERE todo_id = $2",
-      [description, id]
+    const oldTodo = await Todo.findByPk(id);
+    await Todo.update(
+      { description: description },
+      {
+        where: {
+          todo_id: id,
+        },
+      }
     );
-    res.json("Update Successful!");
+    await res.json({
+      status: "successful!",
+      "Old Description": oldTodo.description,
+      "Updated Description": description,
+    });
   } catch (err) {
-    console.log(err.message);
+    console.error(err.message);
   }
 });
 
@@ -72,12 +77,18 @@ app.put("/todos/:id", async (req, res) => {
 app.delete("/todos/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    const deleteTodo = pool.query("DELETE FROM todo WHERE todo_id = $1", [id]);
+    await Todo.destroy({
+      where: {
+        todo_id: id,
+      },
+    });
+
     res.json("Todo was deleted!");
   } catch (err) {
     console.log(err.message);
   }
 });
+
 app.listen(3001, () => {
-  console.log("Server has started on http://localhost:3000");
+  console.log("Server has started on http://localhost:3001");
 });
